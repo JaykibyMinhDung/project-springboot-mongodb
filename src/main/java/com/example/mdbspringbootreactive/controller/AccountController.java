@@ -48,6 +48,11 @@ public class AccountController {
         return accountRepository.findByAccountNum(accountNum).switchIfEmpty(Mono.error(new AccountNotFoundException()));
     }
 
+    @GetMapping("/test")
+    public Mono<String> testServer() {
+        return Mono.just("Hello World");
+    }
+
     @PostMapping("/account/{accountNum}/debit")
     public Mono<Txn> debitAccount(@PathVariable String accountNum, @RequestBody Map<String, Object> requestBody) {
         printLastLineStackTrace("POST /account/" + accountNum + "/debit");
