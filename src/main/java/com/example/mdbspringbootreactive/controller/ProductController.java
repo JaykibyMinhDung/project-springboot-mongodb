@@ -35,8 +35,8 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public Flux<Product> getProduct(@RequestBody String accountNum) {
-        printLastLineStackTrace("GET /product/" + accountNum);
+    public Flux<Product> getProduct() {
+        printLastLineStackTrace("GET /product/");
         return productRepository.findAll();
     }
 
