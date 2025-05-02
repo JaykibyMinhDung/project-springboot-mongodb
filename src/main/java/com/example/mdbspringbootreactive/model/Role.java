@@ -1,5 +1,12 @@
 package com.example.mdbspringbootreactive.model;
 
+
+import lombok.Getter;
+import lombok.Lombok;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Role {
     private String name;
     private int level;
@@ -17,21 +24,5 @@ public class Role {
                 "name='" + name + '\'' +
                 ", level=" + level +
                 '}';
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
     }
 }
