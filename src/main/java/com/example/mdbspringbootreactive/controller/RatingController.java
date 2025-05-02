@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -27,16 +28,17 @@ public class RatingController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<?> getRatings(@PathVariable String productId) {
-        try {
-            LOGGER.info("Nhận yêu cầu lấy rating cho sản phẩm ID: {}", productId);
-            List<Rating> ratings = service.getRatingsByProductId(productId);
-            LOGGER.debug("Trả về {} rating cho sản phẩm ID: {}", ratings.size(), productId);
-            return new ResponseEntity<>(ratings, HttpStatus.OK);
-        } catch (Exception e) {
-            LOGGER.error("Lỗi khi lấy rating cho sản phẩm ID: {}. Chi tiết: {}", productId, e.getMessage(), e);
-            return new ResponseEntity<>("Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public Mono<ResponseEntity<List<Rating>>> getRatings(@PathVariable String productId) {
+        LOGGER.info("Nhận yêu cầu lấy rating cho sản phẩm ID: {}", productId);
+        return service.getRatingsByProductId(productId)
+                .collectList()
+                .map(ratings -> {
+                    LOGGER.debug("Trả về {} rating cho sản phẩm ID: {}", ratings.size(), productId);
+                    return ResponseEntity.ok(ratings);
+                })
+                .doOnError(e -> LOGGER.error("Lỗi khi lấy rating cho sản phẩm ID: {}. Chi tiết: {}", productId, e.getMessage(), e))
+                .onErrorResume(e -> Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Collections.emptyList())));
     }
 
     @PostMapping
@@ -52,9 +54,4 @@ public class RatingController {
                 })
                 .onErrorResume(error -> Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)));
     }
-
-//    @GetMapping("/test123")
-//    public Mono<ResponseEntity<?>> test() {
-//        return Mono.just(new ResponseEntity<>("<div>fafjnf</div>",HttpStatus.OK));
-//    }
 }

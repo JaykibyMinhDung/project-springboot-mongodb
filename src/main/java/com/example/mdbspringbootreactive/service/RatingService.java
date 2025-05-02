@@ -4,6 +4,7 @@ import com.example.mdbspringbootreactive.model.Rating;
 import com.example.mdbspringbootreactive.repository.RatingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public class RatingService {
     @Autowired
     private RatingRepository repository;
 
-    public List<Rating> getRatingsByProductId(String productId) {
+    public Flux<Rating> getRatingsByProductId(String productId) {
         return repository.findByProductId(productId);
     }
 
