@@ -1,15 +1,15 @@
 package com.example.mdbspringbootreactive.model;
 
-public class role {
+public class Role {
     private String name;
     private int level;
 
-    public role(String name, int level) {
+    public Role(String name, int level) {
         this.name = name;
         this.level = level;
     }
 
-    public role() {}
+    public Role() {}
 
     @Override
     public String toString() {

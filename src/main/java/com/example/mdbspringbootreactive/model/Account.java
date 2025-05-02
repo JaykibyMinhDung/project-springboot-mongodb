@@ -23,6 +23,20 @@ public class Account {
     @LastModifiedDate
     private Instant updatedAt;
 
+    public Account() {}
+
+    public Account(String id, String accountNum, String fullName, String email, String password, String address, String phone, Instant createdAt, Instant updatedAt) {
+//        this.id = id;
+        this.accountNum = accountNum;
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.address = address;
+        this.phone = phone;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     public String getId() {
         return id;
     }

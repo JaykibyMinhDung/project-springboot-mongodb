@@ -19,6 +19,7 @@ public class Product {
 
     @Id
     private String id;
+    private String idRating;
     private String category;
     private String description;
     private String image;
@@ -27,13 +28,14 @@ public class Product {
 
     public Product() {}
 
-    public Product(String id, String category, String description, String image, Integer price, String title) {
+    public Product(String id, String category, String description, String image, Integer price, String title, String idRating) {
         this.id = id;
         this.category = category;
         this.description = description;
         this.image = image;
         this.price = price;
         this.title = title;
+        this.idRating = idRating;
     }
 
     public String getId() {
@@ -78,6 +80,14 @@ public class Product {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getIdRating() {
+        return idRating;
+    }
+
+    public void setIdRating(String idRating) {
+        this.idRating = idRating;
     }
 
     public void setTitle(String title) {
