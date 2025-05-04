@@ -1,14 +1,21 @@
 package com.example.mdbspringbootreactive.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.sql.Date;
 
+@Setter
+@Getter
+@Document("order")
 public class Order {
     @Id
-    private int id;
-    private int userId;
-    private int roleId;
+    private String id;
+    private String userId;
+    private String roleId;
     private String methodPayment;
     @CreatedDate
     private Date startDate;
@@ -17,7 +24,7 @@ public class Order {
 
     public Order() {}
 
-    public Order(int id, int userId, int roleId, String methodPayment, Date startDate, String totalCart, String status) {
+    public Order(String id, String userId, String roleId, String methodPayment, Date startDate, String totalCart, String status) {
         this.id = id;
         this.userId = userId;
         this.roleId = roleId;
@@ -27,59 +34,4 @@ public class Order {
         this.status = status;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public int getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(int roleId) {
-        this.roleId = roleId;
-    }
-
-    public String getMethodPayment() {
-        return methodPayment;
-    }
-
-    public void setMethodPayment(String methodPayment) {
-        this.methodPayment = methodPayment;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public String getTotalCart() {
-        return totalCart;
-    }
-
-    public void setTotalCart(String totalCart) {
-        this.totalCart = totalCart;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 }
