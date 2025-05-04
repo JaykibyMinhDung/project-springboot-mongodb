@@ -11,4 +11,6 @@ import java.util.List;
 @Repository
 public interface RatingRepository extends ReactiveMongoRepository<Rating, String> {
     Flux<Rating> findByProductId(String productId);
+
+    Flux<Rating> findByRatingGreaterThan(int rating);
 }

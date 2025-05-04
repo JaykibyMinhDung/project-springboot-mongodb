@@ -1,6 +1,7 @@
 package com.example.mdbspringbootreactive.controller;
 
 import com.example.mdbspringbootreactive.model.Rating;
+import com.example.mdbspringbootreactive.service.ProductService;
 import com.example.mdbspringbootreactive.service.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import reactor.core.publisher.Mono;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +20,8 @@ import java.util.List;
 public class RatingController {
     @Autowired
     private RatingService service;
+
+    private ProductService productService;
 
     private final static Logger LOGGER = LoggerFactory.getLogger(RatingController.class);
 
@@ -45,12 +49,30 @@ public class RatingController {
     public Mono<ResponseEntity<Rating>> addRating(@RequestBody Rating rating) {
         LOGGER.info("Nhận yêu cầu thêm rating: {}", rating);
         return service.addRating(rating)
+                .flatMap(savedRating -> {
+                    // Lấy productId từ rating
+                    String productId = savedRating.getProductId();
+                    // Tìm sản phẩm tương ứng
+                    return productService.findById(productId)
+                            .flatMap(product -> {
+                                // Thêm ID của rating mới vào mảng idRating
+                                List<String> idRatings = product.getIdRating();
+                                if (idRatings == null) {
+                                    idRatings = new ArrayList<>();
+                                }
+                                idRatings.add(savedRating.getId());
+                                product.setIdRating(idRatings);
+                                // Cập nhật sản phẩm
+                                return productService.updateProduct(product)
+                                        .then(Mono.just(savedRating));
+                            });
+                })
                 .map(savedRating -> {
-                    LOGGER.info("Đã lưu rating thành công: {}", savedRating);
+                    LOGGER.info("Đã lưu rating thành công và cập nhật sản phẩm: {}", savedRating);
                     return new ResponseEntity<>(savedRating, HttpStatus.CREATED);
                 })
                 .doOnError(error -> {
-                    LOGGER.error("Lỗi khi lưu rating: {}. Chi tiết: {}", rating, error.getMessage(), error);
+                    LOGGER.error("Lỗi khi lưu rating hoặc cập nhật sản phẩm: {}. Chi tiết: {}", rating, error.getMessage(), error);
                 })
                 .onErrorResume(error -> Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR)));
     }

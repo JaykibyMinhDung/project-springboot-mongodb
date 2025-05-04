@@ -4,8 +4,10 @@ import com.example.mdbspringbootreactive.config.ApiResponse;
 import com.example.mdbspringbootreactive.model.Product;
 import com.example.mdbspringbootreactive.repository.ProductRepository;
 //import com.example.mdbspringbootreactive.service.TxnService;
+import com.example.mdbspringbootreactive.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,21 +23,29 @@ import java.util.List;
 @RequestMapping("/api/products")
 public class ProductController {
     private final static Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
-    private final ProductRepository productRepository;
+//    private final ProductRepository productRepository;
+//
+//    public ProductController(ProductRepository productRepository) {
+//        this.productRepository = productRepository;
+//    }
 
-    public ProductController(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
+    @Autowired
+    private ProductService productService;
 
     private static void printLastLineStackTrace(String context) {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         LOGGER.info("Stack trace's last line: " + stackTrace[stackTrace.length - 1].toString() + " from " + context);
     }
 
+    @GetMapping("/high-rated")
+    public Flux<Product> getHighRatedProducts() {
+        return productService.getHighRatedProducts();
+    }
+
     @PostMapping
     public Mono<ResponseEntity<ApiResponse>> createProduct(@RequestBody Product product) {
         printLastLineStackTrace("POST /product");
-        return productRepository.save(product).then(Mono.just(ResponseEntity.ok().body(
+        return productService.save(product).then(Mono.just(ResponseEntity.ok().body(
                 new ApiResponse("Thêm sản phẩm thành công", HttpStatus.OK.value())
         ))).onErrorResume(error -> {
             LOGGER.error("Lỗi khi thêm sản phẩm " + error.getMessage());
@@ -53,10 +63,10 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size);
         Flux<Product> productFlux;
         if (search != null && !search.isEmpty()) {
-            productFlux = productRepository.findByNameContainingIgnoreCaseAndDeleteFalse(search).skip((long) page * size)
+            productFlux = productService.findByNameContainingIgnoreCaseAndDeleteFalse(search).skip((long) page * size)
                     .take(size);
         } else {
-            productFlux = productRepository.findByDeleteFalse(pageable);
+            productFlux = productService.findByDeleteFalse(pageable);
         }
         return productFlux
                 .collectList()
@@ -74,7 +84,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public Mono<ResponseEntity<ApiResponse<Product>>> getDetailProduct(@PathVariable String id) {
         printLastLineStackTrace("GET /product/" + id);
-        return productRepository.findById(id)
+        return productService.findById(id)
                 .map(orders -> {
                     ApiResponse<Product> response = new ApiResponse<>("Lấy đơn hàng thành công", 1, orders);
                     return ResponseEntity.ok().body(response);
@@ -87,12 +97,12 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public Mono<ResponseEntity<ApiResponse>> updateProduct(@PathVariable String id, @RequestBody Product newProduct) {
-        return productRepository.findById(id)
+        return productService.findById(id)
                 .flatMap(existingProduct -> {
                     existingProduct.setTitle(newProduct.getTitle());
                     existingProduct.setPrice(newProduct.getPrice());
 
-                    return productRepository.save(existingProduct)
+                    return productService.save(existingProduct)
                             .map(updatedProduct -> ResponseEntity.ok().body(
                                     new ApiResponse("Sản phẩm cập nhật thành công", HttpStatus.OK.value(), updatedProduct)
                             ));
@@ -105,10 +115,10 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<ApiResponse>> deleteProduct(@PathVariable String id) {
         printLastLineStackTrace("DELETE /product/" + id);
-        return productRepository.findById(id)
+        return productService.findById(id)
                 .flatMap(product -> {
                     product.setDelete(true);
-                    return productRepository.save(product)
+                    return productService.save(product)
                             .then(Mono.just(ResponseEntity.ok().body(
                                     new ApiResponse("Sản phẩm đã xóa thành công", HttpStatus.OK.value())
                             )));
