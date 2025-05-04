@@ -37,7 +37,7 @@ public class OrderController {
                 });
     }
 
-    @GetMapping("/:id")
+    @GetMapping("/{id}")
     public Mono<ResponseEntity<ApiResponse<List<Order>>>> getAllCart(@RequestParam String id) {
         return service.findCartById(id)
                 .collectList()
@@ -52,7 +52,7 @@ public class OrderController {
                 });
     }
 
-    @GetMapping("/history/:id")
+    @GetMapping("/history/{id}")
     public Mono<ResponseEntity<ApiResponse<List<Order>>>> getHistoryUser(@RequestParam String id) {
         return service.findHistory(id)
                 .collectList()

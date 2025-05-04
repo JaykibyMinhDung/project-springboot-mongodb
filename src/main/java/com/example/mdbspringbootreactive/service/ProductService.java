@@ -1,5 +1,6 @@
 package com.example.mdbspringbootreactive.service;
 
+import com.example.mdbspringbootreactive.model.Category;
 import com.example.mdbspringbootreactive.model.Product;
 import com.example.mdbspringbootreactive.model.Rating;
 import com.example.mdbspringbootreactive.repository.ProductRepository;
@@ -40,6 +41,10 @@ public class ProductService  {
 
     public Mono<Product> findById(String id) {
         return productRepository.findById(id);
+    }
+
+    public Flux<Product> findProductByCategory(String category) {
+        return productRepository.findProductByCategory(category);
     }
 
     public Mono<Product> updateProduct(Product product) {

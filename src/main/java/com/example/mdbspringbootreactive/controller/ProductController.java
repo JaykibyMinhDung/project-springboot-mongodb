@@ -38,8 +38,63 @@ public class ProductController {
     }
 
     @GetMapping("/high-rated")
-    public Flux<Product> getHighRatedProducts() {
-        return productService.getHighRatedProducts();
+    public Mono<ResponseEntity<ApiResponse<List<Product>>>> getHighRatedProducts() {
+        return productService.getHighRatedProducts().collectList()
+                .map(products ->
+                        ResponseEntity.ok(
+                                new ApiResponse<>(
+                                        "Lấy sản phẩm thành công",
+                                        HttpStatus.OK.value(),
+                                        products
+                                )
+                        )
+                )
+                .onErrorResume(error -> {
+                    LOGGER.error("Lỗi khi lấy sản phẩm: {}", error.getMessage());
+                    // Trả về Mono<ResponseEntity<...>>
+                    ApiResponse<List<Product>> res = new ApiResponse<>(
+                            "Lỗi khi lấy sản phẩm",
+                            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            null
+                    );
+                    return Mono.just(
+                            ResponseEntity
+                                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body(res)
+                    );
+                });
+    }
+
+    @GetMapping("/category")
+    public Mono<ResponseEntity<ApiResponse<List<Product>>>> getCategoryProducts(
+            @RequestParam String category) {
+
+        return productService.findProductByCategory(category) // Flux<Product>
+                .collectList()                                   // Mono<List<Product>>
+                .map(products ->
+                        // Tạo ApiResponse có data = danh sách products
+                        ResponseEntity.ok(
+                                new ApiResponse<>(
+                                        "Lấy sản phẩm thành công",
+                                        HttpStatus.OK.value(),
+                                        products
+                                )
+                        )
+                )
+                .onErrorResume(error -> {
+                    LOGGER.error("Lỗi khi lấy sản phẩm: {}", error.getMessage());
+                    // Trả về Mono<ResponseEntity<...>>
+                    ApiResponse<List<Product>> res = new ApiResponse<>(
+                            "Lỗi khi lấy sản phẩm",
+                            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            null
+                    );
+                    return Mono.just(
+                            ResponseEntity
+                                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body(res)
+                    );
+                });
     }
 
     @PostMapping

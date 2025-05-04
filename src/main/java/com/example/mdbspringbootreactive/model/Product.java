@@ -6,6 +6,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Setter
@@ -14,7 +16,7 @@ import java.util.UUID;
 public class Product {
     @Id
     private String id;
-    private String idRating;
+    private List<String> idRating;
     private String category;
     private String description;
     private String image;
@@ -22,11 +24,13 @@ public class Product {
     private String title;
     private Boolean deleted;
 
-    public Product() {}
+    public Product() {
+        this.idRating = new ArrayList<>();  // Initialize as an empty list
+    }
 
-    public Product(String id, String idRating, String category, String description, String image, Integer price, String title, Boolean deleted) {
+    public Product(String id, List<String> idRating, String category, String description, String image, Integer price, String title, Boolean deleted) {
         this.id = id;
-        this.idRating = idRating;
+        this.idRating = idRating != null ? idRating : new ArrayList<>();
         this.category = category;
         this.description = description;
         this.image = image;
@@ -35,14 +39,14 @@ public class Product {
         this.deleted = deleted;
     }
 
-    public Product(String id, String category, String description, String image, Integer price, String title, String idRating) {
+    public Product(String id, String category, String description, String image, Integer price, String title, List<String> idRating) {
         this.id = id;
         this.category = category;
         this.description = description;
         this.image = image;
         this.price = price;
         this.title = title;
-        this.idRating = idRating;
+        this.idRating = idRating != null ? idRating : new ArrayList<>();
     }
 
     @Override
