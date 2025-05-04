@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -46,10 +47,17 @@ public class ProductController {
     @GetMapping
     public Mono<ResponseEntity<ApiResponse<List<Product>>>> getProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search) {
         printLastLineStackTrace("GET /products/");
         Pageable pageable = PageRequest.of(page, size);
-        return productRepository.findByDeleteFalse(pageable)
+        Flux<Product> productFlux;
+        if (search != null && !search.isEmpty()) {
+            productFlux = productRepository.findByNameContainingIgnoreCaseAndDeleteFalse(search, pageable);
+        } else {
+            productFlux = productRepository.findByDeleteFalse(pageable);
+        }
+        return productFlux
                 .collectList()
                 .map(products -> {
                     ApiResponse<List<Product>> response = new ApiResponse<>("Lấy danh sách sản phẩm thành công", 1, products);

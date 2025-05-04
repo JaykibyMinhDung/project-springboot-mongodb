@@ -13,17 +13,12 @@ import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface ProductRepository extends ReactiveMongoRepository<Product, String> {
-//    @Query("{accountNum:'?0'}")
-//    Mono<Product> findByAccountNum(String accountNum);
-
-//    @Update("{'$inc':{'balance': ?1}}")
-//    Mono<Long> findAndIncrementBalanceByAccountNum(String accountNum, double increment);
-
-//    Mono<Product> findAll(SpringDataWebProperties.Sort sort);
-
     @Query("SELECT o FROM Order o")
     Flux<Product> findAll(SpringDataWebProperties.Pageable pageable);
 
     @Query("{ 'deleted': false }")
     Flux<Product> findByDeleteFalse(Pageable pageable);
+
+    @Query("{ 'name': { $regex: ?0, $options: 'i' }, 'delete': false }")
+    Flux<Product> findByNameContainingIgnoreCaseAndDeleteFalse(String name, Pageable pageable);
 }
