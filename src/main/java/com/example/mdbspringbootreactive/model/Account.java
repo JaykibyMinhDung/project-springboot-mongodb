@@ -22,6 +22,7 @@ public class Account {
     private String password;
     private String address;
     private String phone;
+    private Boolean active;
     @CreatedDate
     private Instant createdAt;
     @LastModifiedDate
@@ -39,6 +40,7 @@ public class Account {
         this.phone = phone;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.active = true;
     }
 
     @Override
