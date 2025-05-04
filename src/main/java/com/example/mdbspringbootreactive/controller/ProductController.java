@@ -53,7 +53,8 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size);
         Flux<Product> productFlux;
         if (search != null && !search.isEmpty()) {
-            productFlux = productRepository.findByNameContainingIgnoreCaseAndDeleteFalse(search, pageable);
+            productFlux = productRepository.findByNameContainingIgnoreCaseAndDeleteFalse(search).skip((long) page * size)
+                    .take(size);
         } else {
             productFlux = productRepository.findByDeleteFalse(pageable);
         }

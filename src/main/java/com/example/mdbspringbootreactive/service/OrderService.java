@@ -18,11 +18,19 @@ public class OrderService {
         return repository.findAll();
     }
 
-    public Flux<Order> findOrderById(Integer id) {
+    public Flux<Order> findOrderById(String id) {
         return repository.findByIdOrderById(id);
+    }
+
+    public Flux<Order> findCartById(String id) {
+        return repository.findAllCartById(id);
     }
 
     public Mono<Order> saveOrder(Order order) {
         return repository.save(order);
+    }
+
+    public Flux<Order> findHistory(String id) {
+        return repository.findAllHistoryById(id);
     }
 }
