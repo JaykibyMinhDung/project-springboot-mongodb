@@ -20,4 +20,9 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
+    public ApiResponse(String message, int statusCode) {
+        this.message = message;
+        this.statusCode = statusCode;
+        this.data = null;
+    }
 }

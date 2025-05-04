@@ -6,6 +6,9 @@ import com.example.mdbspringbootreactive.repository.ProductRepository;
 //import com.example.mdbspringbootreactive.service.TxnService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +17,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/products")
 public class ProductController {
     private final static Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
     private final ProductRepository productRepository;
@@ -27,35 +31,48 @@ public class ProductController {
         LOGGER.info("Stack trace's last line: " + stackTrace[stackTrace.length - 1].toString() + " from " + context);
     }
 
-    @PostMapping("/products")
-    public Mono<Product> createProduct(@RequestBody Product product) {
+    @PostMapping
+    public Mono<ResponseEntity<ApiResponse>> createProduct(@RequestBody Product product) {
         printLastLineStackTrace("POST /product");
-        return productRepository.save(product);
+        return productRepository.save(product).then(Mono.just(ResponseEntity.ok().body(
+                new ApiResponse("Thêm sản phẩm thành công", HttpStatus.OK.value())
+        ))).onErrorResume(error -> {
+            LOGGER.error("Lỗi khi thêm sản phẩm " + error.getMessage());
+            ApiResponse<List<Product>> response = new ApiResponse<>("Thêm sản phẩm thất bại", 0, null);
+            return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));
+        });
     }
 
-    @GetMapping("/products")
-    public Mono<ResponseEntity<ApiResponse<List<Product>>>> getProduct() {
-        printLastLineStackTrace("GET /product/");
-        return productRepository.findAll().collectList()
-                .map(orders -> {
-                    ApiResponse<List<Product>> response = new ApiResponse<>("Lấy danh sách đơn hàng thành công", 1, orders);
+    @GetMapping
+    public Mono<ResponseEntity<ApiResponse<List<Product>>>> getProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        printLastLineStackTrace("GET /products/");
+        Pageable pageable = PageRequest.of(page, size);
+        return productRepository.findByDeleteFalse(pageable)
+                .collectList()
+                .map(products -> {
+                    ApiResponse<List<Product>> response = new ApiResponse<>("Lấy danh sách sản phẩm thành công", 1, products);
                     return ResponseEntity.ok().body(response);
                 })
                 .onErrorResume(error -> {
-                    LOGGER.error("Lỗi khi lấy danh sách đơn hàng: " + error.getMessage());
-                    ApiResponse<List<Product>> response = new ApiResponse<>("Lấy danh sách đơn hàng thất bại", 0, null);
+                    LOGGER.error("Lỗi khi lấy danh sách sản phẩm: " + error.getMessage());
+                    ApiResponse<List<Product>> response = new ApiResponse<>("Lấy danh sách sản phẩm thất bại", 0, null);
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));
                 });
     }
 
-    @GetMapping("/products/{id}")
+    @GetMapping("/{id}")
     public Mono<ResponseEntity<ApiResponse<Product>>> getDetailProduct(@PathVariable String id) {
         printLastLineStackTrace("GET /product/" + id);
-//        return accountRepository.findByAccountNum(id).switchIfEmpty(Mono.error(new AccountNotFoundException()));
         return productRepository.findById(id)
                 .map(orders -> {
-                    ApiResponse<Product> response = new ApiResponse<>("Lấy danh sách đơn hàng thành công", 1, orders);
+                    ApiResponse<Product> response = new ApiResponse<>("Lấy đơn hàng thành công", 1, orders);
                     return ResponseEntity.ok().body(response);
+                }).onErrorResume(error -> {
+                    LOGGER.error("Lỗi khi lấy danh sách đơn hàng: " + error.getMessage());
+                    ApiResponse<Product> response = new ApiResponse<>("Lấy đơn hàng thất bại", 0, null);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));
                 });
     }
 
@@ -77,13 +94,15 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public Mono<ResponseEntity<String>> deleteProduct(@PathVariable String id) {
+    public Mono<ResponseEntity<ApiResponse>> deleteProduct(@PathVariable String id) {
         printLastLineStackTrace("DELETE /product/" + id);
         return productRepository.findById(id)
                 .flatMap(product -> {
-                    product.setDelete(true); // Cập nhật trường delete thành true
+                    product.setDelete(true);
                     return productRepository.save(product)
-                            .then(Mono.just(ResponseEntity.ok("Xóa sản phẩm thành công")));
+                            .then(Mono.just(ResponseEntity.ok().body(
+                                    new ApiResponse("Sản phẩm đã xóa thành công", HttpStatus.OK.value())
+                            )));
                 })
                 .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
