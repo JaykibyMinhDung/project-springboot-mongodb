@@ -2,7 +2,7 @@ package com.example.mdbspringbootreactive.controller;
 
 import com.example.mdbspringbootreactive.config.ApiResponse;
 import com.example.mdbspringbootreactive.entity.ResponseMessage;
-import com.example.mdbspringbootreactive.enumeration.ErrorReason;
+//import com.example.mdbspringbootreactive.enumeration.ErrorReason;
 import com.example.mdbspringbootreactive.exception.AccountNotFoundException;
 import com.example.mdbspringbootreactive.model.Account;
 import com.example.mdbspringbootreactive.model.Product;
@@ -92,13 +92,13 @@ public class AccountController {
     }
 
 
-    @ExceptionHandler(AccountNotFoundException.class)
-    ResponseEntity<ResponseMessage> accountNotFound(AccountNotFoundException ex) {
-        return ResponseEntity.badRequest().body(new ResponseMessage(ErrorReason.ACCOUNT_NOT_FOUND.name()));
-    }
+//    @ExceptionHandler(AccountNotFoundException.class)
+//    ResponseEntity<ResponseMessage> accountNotFound(AccountNotFoundException ex) {
+//        return ResponseEntity.badRequest().body(new ResponseMessage(ErrorReason.ACCOUNT_NOT_FOUND.name()));
+//    }
 
-    @ExceptionHandler(DuplicateKeyException.class)
-    ResponseEntity<ResponseMessage> duplicateAccount(DuplicateKeyException ex) {
-        return ResponseEntity.badRequest().body(new ResponseMessage(ErrorReason.DUPLICATE_ACCOUNT.name()));
-    }
+//    @ExceptionHandler(DuplicateKeyException.class)
+//    ResponseEntity<ResponseMessage> duplicateAccount(DuplicateKeyException ex) {
+//        return ResponseEntity.badRequest().body(new ResponseMessage(ErrorReason.DUPLICATE_ACCOUNT.name()));
+//    }
 }

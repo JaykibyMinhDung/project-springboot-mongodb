@@ -22,6 +22,7 @@ public interface ProductRepository extends ReactiveMongoRepository<Product, Stri
     @Query("{ 'name': { $regex: ?0, $options: 'i' }, 'delete': false }")
     Flux<Product> findByNameContainingIgnoreCaseAndDeleteFalse(String name);
 
+    @Query("{ 'category': ?0 }")
     Flux<Product> findProductByCategory(String category);
 
     Flux<Product> findByIdIn(Flux<String> ids);
