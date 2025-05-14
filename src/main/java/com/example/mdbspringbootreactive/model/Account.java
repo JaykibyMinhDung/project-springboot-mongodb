@@ -41,6 +41,11 @@ public class Account {
         this.active = true;
     }
 
+    public Account(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
     public String getId() {
         return id;
     }
