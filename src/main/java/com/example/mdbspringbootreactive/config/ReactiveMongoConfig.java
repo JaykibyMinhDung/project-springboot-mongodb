@@ -11,8 +11,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory;
 import org.springframework.data.mongodb.ReactiveMongoTransactionManager;
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 
 @Configuration
+@EnableMongoAuditing
 public class ReactiveMongoConfig extends AbstractReactiveMongoConfiguration {
 
     private final MongoProperties mongoProperties;

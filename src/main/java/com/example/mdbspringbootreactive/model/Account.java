@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Document("accounts")
 public class Account {
@@ -22,13 +23,13 @@ public class Account {
     private String phone;
     private Boolean active;
     @CreatedDate
-    private Instant createdAt;
+    private LocalDateTime createdAt;
     @LastModifiedDate
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 
     public Account() {}
 
-    public Account(String id, String accountNum, String fullName, String email, String password, String address, String phone, Instant createdAt, Instant updatedAt) {
+    public Account(String id, String accountNum, String fullName, String email, String password, String address, String phone, LocalDateTime createdAt, LocalDateTime updatedAt) {
 //        this.id = id;
         this.accountNum = accountNum;
         this.fullName = fullName;
@@ -105,19 +106,19 @@ public class Account {
         this.active = active;
     }
 
-    public Instant getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Instant getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 

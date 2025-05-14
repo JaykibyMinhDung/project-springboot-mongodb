@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -37,6 +38,7 @@ public class AccountController {
     @PostMapping
     public Mono<ResponseEntity<ApiResponse>> createAccount(@RequestBody Account account) {
         printLastLineStackTrace("POST /account");
+        account.setCreatedAt(LocalDateTime.now());
         return accountRepository.save(account).then(Mono.just(ResponseEntity.ok().body(
                 new ApiResponse("Thêm người dùng thành công", HttpStatus.OK.value())
         ))).onErrorResume(error -> {
@@ -57,7 +59,14 @@ public class AccountController {
         printLastLineStackTrace("PATCH /account/" + id);
         return accountRepository.findById(id)
                 .flatMap(user -> {
-                    return accountRepository.save(newUser)
+                    user.setFullName(newUser.getFullName());
+                    user.setEmail(newUser.getEmail());
+                    user.setAddress(newUser.getAddress());
+                    user.setPhone(newUser.getPhone());
+                    user.setActive(true);
+                    user.setUpdatedAt(LocalDateTime.now());
+
+                    return accountRepository.save(user)
                             .map(updatedProduct -> ResponseEntity.ok().body(
                                     new ApiResponse("Cập nhật người dùng thành công", HttpStatus.OK.value(), updatedProduct)
                             ));

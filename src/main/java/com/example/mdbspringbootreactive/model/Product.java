@@ -2,7 +2,9 @@ package com.example.mdbspringbootreactive.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -20,13 +22,19 @@ public class Product {
     private String image;
     private Integer price;  // Dùng Integer vì trong MongoDB là Int32
     private String title;
+    private Integer quantity;
     private Boolean deleted;
+
+    @CreatedDate
+    private LocalDateTime createdDate;
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
 
     public Product() {
         this.idRating = new ArrayList<>();  // Initialize as an empty list
     }
 
-    public Product(String id, List<String> idRating, String category, String description, String image, Integer price, String title, Boolean deleted) {
+    public Product(String id, List<String> idRating, String category, String description, String image, Integer price, String title, Boolean deleted, Integer quantity, LocalDateTime createdDate, LocalDateTime lastModifiedDate) {
         this.id = id;
         this.idRating = idRating != null ? idRating : new ArrayList<>();
         this.category = category;
@@ -35,6 +43,9 @@ public class Product {
         this.price = price;
         this.title = title;
         this.deleted = deleted;
+        this.quantity = quantity;
+        this.createdDate = createdDate;
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public Product(String id, String category, String description, String image, Integer price, String title, List<String> idRating) {
@@ -101,6 +112,30 @@ public class Product {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     @Override

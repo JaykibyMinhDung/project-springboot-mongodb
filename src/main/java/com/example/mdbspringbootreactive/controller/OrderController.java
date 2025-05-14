@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -70,6 +72,7 @@ public class OrderController {
     @PostMapping
     public Mono<ResponseEntity<ApiResponse<Order>>> create(@RequestBody Order order) {
         LOGGER.info("Nhận yêu cầu lưu đơn hàng: {}", order);
+        order.setStartDate(new Date());
         return service.saveOrder(order)
                 .map(savedOrder -> {
                     ApiResponse<Order> response = new ApiResponse<>("Giao dịch thành công", 1, savedOrder);
@@ -96,6 +99,7 @@ public class OrderController {
                     if (updatedOrder.getTotalCart() != null) {
                         existingOrder.setTotalCart(updatedOrder.getTotalCart());
                     }
+                    existingOrder.setUpdateDate(new Date());
                     // Thêm các trường khác nếu cần
                     return service.saveOrder(existingOrder);
                 })

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -43,17 +44,17 @@ public class ProductController {
                 .map(products ->
                         ResponseEntity.ok(
                                 new ApiResponse<>(
-                                        "Lấy sản phẩm thành công",
+                                        "Lấy danh sách thành công",
                                         HttpStatus.OK.value(),
                                         products
                                 )
                         )
                 )
                 .onErrorResume(error -> {
-                    LOGGER.error("Lỗi khi lấy sản phẩm: {}", error.getMessage());
+                    LOGGER.error("Lỗi khi lấy danh sách: {}", error.getMessage());
                     // Trả về Mono<ResponseEntity<...>>
                     ApiResponse<List<Product>> res = new ApiResponse<>(
-                            "Lỗi khi lấy sản phẩm",
+                            "Lỗi khi lấy danh sách",
                             HttpStatus.INTERNAL_SERVER_ERROR.value(),
                             null
                     );
@@ -75,7 +76,7 @@ public class ProductController {
                         // Tạo ApiResponse có data = danh sách products
                         ResponseEntity.ok(
                                 new ApiResponse<>(
-                                        "Lấy sản phẩm thành công",
+                                        "Lấy danh sách thu mục thành công",
                                         HttpStatus.OK.value(),
                                         products
                                 )
@@ -100,6 +101,8 @@ public class ProductController {
     @PostMapping
     public Mono<ResponseEntity<ApiResponse>> createProduct(@RequestBody Product product) {
         printLastLineStackTrace("POST /product");
+        product.setCreatedDate(LocalDateTime.now());
+//        product.setQuantity();
         return productService.save(product).then(Mono.just(ResponseEntity.ok().body(
                 new ApiResponse("Thêm sản phẩm thành công", HttpStatus.OK.value())
         ))).onErrorResume(error -> {
@@ -141,10 +144,10 @@ public class ProductController {
         printLastLineStackTrace("GET /product/" + id);
         return productService.findById(id)
                 .map(orders -> {
-                    ApiResponse<Product> response = new ApiResponse<>("Lấy đơn hàng thành công", 1, orders);
+                    ApiResponse<Product> response = new ApiResponse<>("Lấy sản phẩm thành công", 1, orders);
                     return ResponseEntity.ok().body(response);
                 }).onErrorResume(error -> {
-                    LOGGER.error("Lỗi khi lấy danh sách đơn hàng: " + error.getMessage());
+                    LOGGER.error("Lỗi khi lấy chi tiết sản phẩm: " + error.getMessage());
                     ApiResponse<Product> response = new ApiResponse<>("Lấy đơn hàng thất bại", 0, null);
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));
                 });
@@ -156,6 +159,13 @@ public class ProductController {
                 .flatMap(existingProduct -> {
                     existingProduct.setTitle(newProduct.getTitle());
                     existingProduct.setPrice(newProduct.getPrice());
+                    existingProduct.setCategory(newProduct.getCategory());
+                    existingProduct.setDescription(newProduct.getDescription());
+                    existingProduct.setImage(newProduct.getImage());
+                    existingProduct.setLastModifiedDate(LocalDateTime.now());
+                    if (newProduct.getIdRating() != null) {
+                        existingProduct.getIdRating().addAll(newProduct.getIdRating());
+                    }
 
                     return productService.save(existingProduct)
                             .map(updatedProduct -> ResponseEntity.ok().body(
