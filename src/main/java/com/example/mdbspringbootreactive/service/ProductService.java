@@ -53,6 +53,7 @@ public class ProductService  {
                     existingProduct.setTitle(product.getTitle());
                     existingProduct.setDescription(product.getDescription());
                     existingProduct.setPrice(product.getPrice());
+                    existingProduct.setQuantity(product.getQuantity());
                     return productRepository.save(existingProduct);
                 })
                 .switchIfEmpty(Mono.error(new RuntimeException("Product not found")));

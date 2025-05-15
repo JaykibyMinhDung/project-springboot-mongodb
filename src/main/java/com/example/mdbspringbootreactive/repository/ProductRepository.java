@@ -19,7 +19,7 @@ public interface ProductRepository extends ReactiveMongoRepository<Product, Stri
     @Query("{ 'deleted': false }")
     Flux<Product> findByDeleteFalse(Pageable pageable);
 
-    @Query("{ 'name': { $regex: ?0, $options: 'i' }, 'delete': false }")
+    @Query("{ 'title': { $regex: ?0, $options: 'i' }, 'deleted': false }")
     Flux<Product> findByNameContainingIgnoreCaseAndDeleteFalse(String name);
 
     @Query("{ 'category': ?0 }")
